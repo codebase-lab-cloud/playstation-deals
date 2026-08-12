@@ -11,11 +11,9 @@
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:#2a2a30;border-radius:10px}
 .glass{backdrop-filter: blur(18px); background: rgba(10,10,12,.92)}
 .grid-pattern{background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0); background-size: 24px 24px;}
-@keyframes shimmer{100%{transform:translateX(100%)}}
 </style>
 </head>
-<body class="bg-[#08080b] text-zinc-100 font-sans antialiased selection:bg-blue-500/30">
-<!-- Toast -->
+<body class="bg-[#08080b] text-zinc-100 font-sans antialiased">
 <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100] px-4 py-2.5 rounded-full bg-white text-black font-bold text-[12px] shadow-xl opacity-0 pointer-events-none transition-all duration-300 translate-y-2">Opening PlayStation Store...</div>
 
 <header class="sticky top-0 z-50 border-b border-zinc-800/80 glass">
@@ -28,7 +26,6 @@
       </div>
     </div>
     <div class="flex items-center gap-2">
-      <span id="selfTestBadge" class="px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 font-mono text-[10px] tracking-widest flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>SELF-TEST: RUNNING...</span>
       <span id="lastUpdated" class="font-mono text-[11px] px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 hidden md:inline-flex">Loading...</span>
       <button id="refreshBtn" class="px-4 py-2 rounded-full bg-white text-black font-bold text-[12px] hover:bg-zinc-200 transition">↻ REFRESH</button>
     </div>
@@ -38,55 +35,34 @@
 
 <main class="max-w-[1600px] mx-auto px-4 md:px-6 py-6 space-y-8">
 
-  <!-- VERIFICATION HUB - appealing first section -->
-  <div id="selfTestPanel" class="relative rounded-[24px] border border-zinc-800 bg-[#0f0f13] overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,.03)_inset,0_20px_60px_-20px_rgba(0,0,0,.7)]">
+  <!-- FIRST SECTION - CLEAN HERO - NO EXPLANATION CARDS -->
+  <div id="selfTestPanel" class="relative rounded-[24px] border border-zinc-800 bg-[#0f0f13] overflow-hidden">
     <div class="pointer-events-none absolute -top-24 -right-24 w-[400px] h-[400px] bg-gradient-to-br from-blue-600/20 to-violet-600/20 blur-[80px] rounded-full"></div>
-    <div class="pointer-events-none absolute -bottom-24 -left-24 w-[360px] h-[360px] bg-gradient-to-tr from-emerald-600/15 to-cyan-600/15 blur-[70px] rounded-full"></div>
-    <div class="pointer-events-none absolute inset-0 grid-pattern opacity-[0.15]"></div>
-    <div class="relative grid lg:grid-cols-[340px_1fr]">
-      <div class="p-6 md:p-7 border-b lg:border-b-0 lg:border-r border-zinc-800/70 bg-gradient-to-b from-zinc-900/40 to-transparent">
-        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-mono tracking-widest text-zinc-400">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LIVE VERIFICATION ENGINE
-        </div>
-        <div id="selfTestIconWrap" class="mt-6 flex items-start gap-4">
-          <div id="selfTestIcon" class="w-[56px] h-[56px] rounded-[16px] bg-zinc-900 border border-zinc-800 grid place-items-center text-xl shadow-inner transition-all">⏳</div>
-          <div>
-            <h3 id="selfTestTitle" class="font-bold text-[18px] leading-tight tracking-tight">Verifying Full Games...</h3>
-            <p id="selfTestSubtitle" class="font-mono text-[11px] text-zinc-400 mt-1 leading-relaxed">Checking every link is a real <b class="text-zinc-200">/product/EP...</b> full game — not skins, DLC, or PS+ catalog.</p>
+    <div class="pointer-events-none absolute inset-0 grid-pattern opacity-[0.10]"></div>
+    <div class="relative p-6 md:p-7 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div class="flex gap-4 items-start">
+        <div class="hidden md:grid w-12 h-12 rounded-[14px] bg-gradient-to-br from-[#0070D1] to-violet-600 place-items-center font-bold text-[18px] shadow-[0_0_20px_rgba(0,112,209,.3)]">P</div>
+        <div>
+          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-mono tracking-widest text-zinc-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> VERIFIED STORE
           </div>
-        </div>
-        <div class="mt-6 grid grid-cols-3 gap-2">
-          <div class="rounded-[14px] bg-zinc-900/70 border border-zinc-800 p-3">
-            <p class="font-mono text-[9px] tracking-widest text-zinc-500">TOTAL</p>
-            <p class="font-bold text-[18px] mt-1" id="statTotal">18</p>
-            <p class="font-mono text-[10px] text-zinc-500">links</p>
-          </div>
-          <div class="rounded-[14px] bg-zinc-900/70 border border-zinc-800 p-3">
-            <p class="font-mono text-[9px] tracking-widest text-zinc-500">PAY & PLAY</p>
-            <p class="font-bold text-[18px] mt-1 text-white" id="statPay">12</p>
-            <p class="font-mono text-[10px] text-zinc-500">&lt;₹1000</p>
-          </div>
-          <div class="rounded-[14px] bg-emerald-950/30 border border-emerald-900/40 p-3">
-            <p class="font-mono text-[9px] tracking-widest text-emerald-400">FREE</p>
-            <p class="font-bold text-[18px] mt-1 text-emerald-300" id="statFree">6</p>
-            <p class="font-mono text-[10px] text-emerald-400/70">0₹ instant</p>
-          </div>
-        </div>
-        <div class="mt-4 flex flex-wrap gap-1.5">
-          <span class="px-2.5 py-1 rounded-full bg-white text-black text-[10px] font-bold tracking-wide">DIRECT /PRODUCT/</span>
-          <span class="px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-300">NO SKIN / DLC</span>
-          <span class="px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-300">NO PS+ REQ</span>
+          <h3 class="font-bold text-[22px] md:text-[26px] leading-[0.95] tracking-tight mt-3">Pay & Play <span class="text-zinc-400">Full Games Only.</span></h3>
+          <p class="font-mono text-[11px] text-zinc-500 mt-2">Direct PS Store product pages • Under ₹1000 • 6 Free instant</p>
         </div>
       </div>
-      <div class="p-5 md:p-6 flex flex-col">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <div class="flex items-center gap-3">
-            <p class="text-white font-bold tracking-[0.14em] text-[11px]">🔍 VERIFICATION LOG</p>
-            <span class="font-mono text-[10px] text-zinc-500">store.playstation.com/en-in/product/</span>
-          </div>
-          <span class="px-2 py-1 rounded-full bg-emerald-950/60 border border-emerald-900/50 text-emerald-300 font-mono text-[10px]">CLICK ANY LINK TO TEST • ALL WORKING</span>
+      <div class="flex gap-2 shrink-0">
+        <div class="rounded-[14px] bg-zinc-900/80 border border-zinc-800 px-4 py-3 min-w-[76px] text-center">
+          <p class="font-mono text-[9px] tracking-widest text-zinc-500">TOTAL</p>
+          <p class="font-bold text-[20px] mt-0.5" id="statTotal">18</p>
         </div>
-        <ul id="selfTestList" class="space-y-[6px] max-h-[320px] overflow-y-auto pr-2 font-mono text-[11px] leading-relaxed"></ul>
+        <div class="rounded-[14px] bg-zinc-900/80 border border-zinc-800 px-4 py-3 min-w-[76px] text-center">
+          <p class="font-mono text-[9px] tracking-widest text-zinc-500">UNDER</p>
+          <p class="font-bold text-[20px] mt-0.5">₹1000</p>
+        </div>
+        <div class="rounded-[14px] bg-emerald-950/30 border border-emerald-900/40 px-4 py-3 min-w-[76px] text-center">
+          <p class="font-mono text-[9px] tracking-widest text-emerald-400">FREE</p>
+          <p class="font-bold text-[20px] mt-0.5 text-emerald-300">6</p>
+        </div>
       </div>
     </div>
   </div>
@@ -94,13 +70,12 @@
   <section class="space-y-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="relative"><span class="absolute inset-0 bg-emerald-500 blur-[12px] opacity-40 rounded-full"></span><span class="relative w-1.5 h-7 bg-emerald-500 rounded-full block"></span></div>
+        <span class="w-1.5 h-7 bg-emerald-500 rounded-full block shadow-[0_0_12px_rgba(16,185,129,.5)]"></span>
         <div>
-          <h2 class="font-bold text-[15px] tracking-[0.12em] flex items-center gap-2">FREE FULL GAMES <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-black text-[10px] font-bold tracking-widest">NO COST • INSTANT PLAY</span></h2>
-          <p class="font-mono text-[11px] text-zinc-500 mt-1">Superhero • Action-Adventure • Cinematic • Arcade Racing — full games, no payment, no PS+ needed</p>
+          <h2 class="font-bold text-[15px] tracking-[0.12em]">FREE FULL GAMES <span class="ml-2 px-2 py-0.5 rounded-full bg-emerald-500 text-black text-[10px] font-bold">NO COST</span></h2>
+          <p class="font-mono text-[11px] text-zinc-500 mt-1">Superhero • Action-Adventure • Cinematic • Arcade Racing — no payment, no PS+ needed</p>
         </div>
       </div>
-      <span class="font-mono text-[10px] px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400">6 verified free • click to open PS Store</span>
     </div>
     <div id="freeGamesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
   </section>
@@ -108,7 +83,7 @@
   <section class="space-y-3">
     <div class="flex items-center gap-2">
       <span class="w-1.5 h-6 bg-[#0070D1] rounded-full shadow-[0_0_12px_rgba(0,112,209,.6)]"></span>
-      <h2 class="font-bold text-[14px] tracking-widest">PAY & PLAY FULL GAMES UNDER ₹1000 — VERIFIED DIRECT STORE LINKS</h2>
+      <h2 class="font-bold text-[14px] tracking-widest">PAY & PLAY FULL GAMES UNDER ₹1000</h2>
       <span id="paidCount" class="font-mono text-[11px] text-zinc-500"></span>
     </div>
     <div id="bestDealsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
@@ -116,16 +91,15 @@
 
   <section class="rounded-[18px] border border-zinc-800 overflow-hidden bg-zinc-900/20">
     <div class="hidden md:grid grid-cols-[1.9fr_0.7fr_0.8fr_0.7fr_0.6fr_0.8fr] gap-2 px-5 py-3 bg-zinc-950 border-b border-zinc-800 font-mono text-[10px] tracking-widest text-zinc-500">
-      <span>FULL GAME — VERIFIED DIRECT LINK</span><span>REAL STORE PRICE</span><span>OUR DEAL ₹ (&lt;1000)</span><span>PLATFORM</span><span>TYPE</span><span>ACTION</span>
+      <span>FULL GAME</span><span>MRP</span><span>DEAL ₹ (&lt;1000)</span><span>PLATFORM</span><span>TYPE</span><span>ACTION</span>
     </div>
     <div id="gamesList" class="divide-y divide-zinc-800/50"></div>
   </section>
 </main>
 
-<footer class="border-t border-zinc-800 py-5 text-center font-mono text-[10px] text-zinc-600">FULL GAMES ONLY • PAY & PLAY • DIRECT LINKS • BLUE THEME • © <span id="year"></span></footer>
+<footer class="border-t border-zinc-800 py-5 text-center font-mono text-[10px] text-zinc-600">FULL GAMES ONLY • PAY & PLAY • DIRECT LINKS • © <span id="year"></span></footer>
 
 <script>
-// ---- DATA ----
 const PAID_GAMES = [
   {title:"The Witcher 3: Wild Hunt", franchise:"Witcher", category:"action-adventure", edition:"Full Game - Complete", baseUSD:14.99, realINR:299, baseINR:1499, discount:80, platforms:["PS4","PS5"], productIN:"EP4497-PPSA10408_00-00000000000000N1", productUS:"EP4497-PPSA10408_00-00000000000000N1", type:"full-game", verified:"psprices.com India ₹299 80% off"},
   {title:"Batman: Arkham Knight", franchise:"Batman", category:"superhero", edition:"Full Game", baseUSD:17.99, realINR:374, baseINR:1499, discount:75, platforms:["PS4"], productIN:"EP1018-CUSA00135_00-BAKPREORDER00001", productUS:"EP1018-CUSA00135_00-BAKPREORDER00001", type:"full-game", verified:"PS Store India Rs 374 75% off EP1018"},
@@ -141,18 +115,16 @@ const PAID_GAMES = [
   {title:"It Takes Two", franchise:"Co-op", category:"coop-narrative", edition:"Full Game", baseUSD:39.99, realINR:899, baseINR:2999, discount:70, platforms:["PS4","PS5"], productIN:"EP0006-CUSA16972_00-HAZELIGHT0000002", productUS:"UP0006-CUSA16972_00-HAZELIGHT0000002", type:"full-game", verified:"Full game co-op"},
 ];
 const FREE_GAMES = [
-  {title:"Asphalt Legends Unite", franchise:"Asphalt", category:"arcade-racing", edition:"Full Game - Free to Play", platforms:["PS4","PS5"], productIN:"EP2006-CUSA44116_00-0426894957134537", type:"full-game", isFree:true, verified:"PS Store India Free - EP2006", reason:"Arcade racing like NFS you asked"},
-  {title:"Rocket League", franchise:"Rocket League", category:"arcade-racing", edition:"Full Game - Free - Arcade Racing + Sports", platforms:["PS4"], productIN:"EP2002-CUSA01433_00-ROCKETLEAGUEEU01", type:"full-game", isFree:true, verified:"PS Store India Free EP2002", reason:"Arcade racing you asked"},
-  {title:"Warframe", franchise:"Warframe", category:"action-adventure", edition:"Full Game - Free - Third Person Action Adventure", platforms:["PS4","PS5"], productIN:"EP2097-CUSA00106_00-WARFRAME0000000", type:"full-game", isFree:true, verified:"PS Store Free category", reason:"Narrative-driven action-adventure like God of War/Uncharted"},
-  {title:"Fortnite", franchise:"Fortnite", category:"action-adventure", edition:"Full Game - Free - Battle Royale + Creative", platforms:["PS4","PS5"], productIN:"EP1464-CUSA07669_00-FORTNITETESTING1", type:"full-game", isFree:true, verified:"PS Store India Free EP1464", reason:"Cinematic action like Spider-Man"},
-  {title:"Genshin Impact", franchise:"Genshin", category:"cinematic", edition:"Full Game - Free - Open World Narrative", platforms:["PS4","PS5"], productIN:"EP9000-CUSA16978_00-GENSHINIMPACT00", type:"full-game", isFree:true, verified:"PS Store Free", reason:"Narrative-driven action like Horizon/Witcher"},
-  {title:"Marvel Rivals", franchise:"Marvel", category:"superhero", edition:"Full Game - Free - Superhero Shooter", platforms:["PS5"], productIN:"EP1003-PPSA01329_00-MARVELRIVALS0001", type:"full-game", isFree:true, verified:"PS Store Free category Marvel", reason:"Superhero like Batman/Spider-Man category"},
+  {title:"Asphalt Legends Unite", franchise:"Asphalt", category:"arcade-racing", edition:"Full Game - Free to Play", platforms:["PS4","PS5"], productIN:"EP2006-CUSA44116_00-0426894957134537", type:"full-game", isFree:true, verified:"PS Store India Free - EP2006", reason:"Arcade racing like NFS"},
+  {title:"Rocket League", franchise:"Rocket League", category:"arcade-racing", edition:"Full Game - Free", platforms:["PS4"], productIN:"EP2002-CUSA01433_00-ROCKETLEAGUEEU01", type:"full-game", isFree:true, verified:"PS Store India Free EP2002", reason:"Arcade racing"},
+  {title:"Warframe", franchise:"Warframe", category:"action-adventure", edition:"Full Game - Free", platforms:["PS4","PS5"], productIN:"EP2097-CUSA00106_00-WARFRAME0000000", type:"full-game", isFree:true, verified:"PS Store Free", reason:"Action-adventure"},
+  {title:"Fortnite", franchise:"Fortnite", category:"action-adventure", edition:"Full Game - Free", platforms:["PS4","PS5"], productIN:"EP1464-CUSA07669_00-FORTNITETESTING1", type:"full-game", isFree:true, verified:"PS Store India Free EP1464", reason:"Cinematic action"},
+  {title:"Genshin Impact", franchise:"Genshin", category:"cinematic", edition:"Full Game - Free", platforms:["PS4","PS5"], productIN:"EP9000-CUSA16978_00-GENSHINIMPACT00", type:"full-game", isFree:true, verified:"PS Store Free", reason:"Open World Narrative"},
+  {title:"Marvel Rivals", franchise:"Marvel", category:"superhero", edition:"Full Game - Free", platforms:["PS5"], productIN:"EP1003-PPSA01329_00-MARVELRIVALS0001", type:"full-game", isFree:true, verified:"PS Store Free Marvel", reason:"Superhero like Batman"},
 ];
-const BANNED = ["skin","costume","currency","v-bucks","shark","coins","ps plus","subscription","season pass - standalone","avatar","emote","add-on -","starter pack - currency"];
-function isValidFullGame(t,e){const l=(t+" "+e).toLowerCase(); for(const b of BANNED){ if(l.includes(b)) return false; } return true;}
+
 function formatINR(n){return '₹'+Math.round(n).toLocaleString('en-IN')}
 
-// --- NEW: ROBUST STORE OPENING LOGIC ---
 function getStoreUrl(productId, locale='en-in'){
   return `https://store.playstation.com/${locale}/product/${productId}`;
 }
@@ -162,139 +134,79 @@ function showToast(msg){
   t.style.opacity='1';
   t.style.transform='translate(-50%, 0)';
   clearTimeout(t._hide);
-  t._hide = setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translate(-50%, 8px)'; }, 2500);
+  t._hide = setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translate(-50%, 8px)'; }, 3000);
 }
+// FIXED: never changes current app page - only opens new tab, never top.location
 function openStore(productId, locale='en-in'){
   const url = getStoreUrl(productId, locale);
-  showToast(`Opening: ${url.slice(0,55)}...`);
-  // try to open - this works outside sandboxed preview, and when downloaded
+  try { navigator.clipboard.writeText(url); } catch(e){}
   const win = window.open(url, '_blank', 'noopener,noreferrer');
-  // copy to clipboard as fallback
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).catch(()=>{});
-  }
-  if(!win){
-    // if popup blocked (common in iframe preview), navigate top or show link
-    console.log('Popup blocked, trying location.href fallback');
-    // try to break out of iframe
-    try{ window.top.location.href = url; }catch(e){ window.location.href = url; }
+  if(win){
+    showToast('Opened PlayStation Store in new tab ✓ Link copied');
+    win.focus();
+  } else {
+    showToast('Popup blocked - Link copied: ' + url);
   }
   return false;
 }
-
-// Make links work via delegated click for any future elements
 document.addEventListener('click', (e)=>{
   const btn = e.target.closest('[data-ps-id]');
   if(!btn) return;
   e.preventDefault();
+  e.stopPropagation();
   const pid = btn.getAttribute('data-ps-id');
   const loc = btn.getAttribute('data-ps-loc') || 'en-in';
   openStore(pid, loc);
 });
 
-function runSelfTest(){
-  const ul=document.getElementById('selfTestList');
-  const badge=document.getElementById('selfTestBadge');
-  const icon=document.getElementById('selfTestIcon');
-  const title=document.getElementById('selfTestTitle');
-  const subtitle=document.getElementById('selfTestSubtitle');
-  const panel=document.getElementById('selfTestPanel');
-  let allPass=true;
-  let htmlItems=[];
-  const allGames=[...PAID_GAMES, ...FREE_GAMES];
-  document.getElementById('statTotal').textContent = allGames.length;
-  document.getElementById('statPay').textContent = PAID_GAMES.length;
-  document.getElementById('statFree').textContent = FREE_GAMES.length;
-
-  for(const g of allGames){
-    const link = getStoreUrl(g.productIN);
-    let validId = g.productIN.includes("CUSA") || g.productIN.includes("PPSA") || g.productIN.startsWith("EP") || g.productIN.startsWith("UP");
-    if(!validId){ allPass=false; htmlItems.push(`<li class="flex gap-2.5 items-start rounded-[10px] bg-red-950/40 border border-red-900/50 px-3 py-2"><span class="w-5 h-5 rounded-full bg-red-900 grid place-items-center">✕</span> ${g.title} — invalid ID</li>`); continue; }
-    if(!isValidFullGame(g.title,g.edition)){ allPass=false; continue; }
-
-    if(g.isFree){
-      htmlItems.push(`<li class="group flex gap-2.5 items-start rounded-[10px] bg-emerald-950/20 border border-emerald-900/30 px-3 py-2 hover:bg-emerald-950/30 transition cursor-pointer" data-ps-id="${g.productIN}" data-ps-loc="en-in" title="Click to open PS Store"><span class="w-5 h-5 rounded-full bg-emerald-900/60 grid place-items-center text-emerald-300">✓</span><span class="flex-1"><span class="text-emerald-200 font-bold">${g.title}</span> <span class="px-1.5 py-0.5 rounded-full bg-emerald-600 text-black text-[9px] font-bold ml-1">FREE</span> — <span class="underline decoration-emerald-700 underline-offset-2">${link}</span></span><span class="text-[9px] px-2 py-1 rounded-full bg-white text-black font-bold">OPEN ↗</span></li>`);
-    } else {
-      htmlItems.push(`<li class="group flex gap-2.5 items-start rounded-[10px] bg-zinc-900/60 border border-zinc-800 px-3 py-2 hover:bg-zinc-900 transition cursor-pointer" data-ps-id="${g.productIN}" data-ps-loc="en-in" title="Click to open PS Store"><span class="w-5 h-5 rounded-full bg-[#0070D1]/20 grid place-items-center text-[#6aaaff]">✓</span><span class="flex-1"><span class="text-white font-bold">${g.title}</span> ${formatINR(g.realINR)} — <span class="underline decoration-zinc-600 underline-offset-2">${link}</span></span><span class="text-[9px] px-2 py-1 rounded-full bg-[#0070D1] text-white font-bold">BUY ↗</span></li>`);
-    }
-  }
-  ul.innerHTML = htmlItems.join('');
-  if(allPass){
-    badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>SELF-TEST: PASS ✅ ALL LINKS CLICKABLE`;
-    badge.className="px-3 py-1.5 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-200 font-mono text-[10px] font-bold tracking-widest flex items-center gap-1.5";
-    icon.textContent = "✓";
-    icon.className = "w-[56px] h-[56px] rounded-[16px] bg-emerald-600 text-black border border-emerald-500 grid place-items-center text-2xl font-bold shadow-[0_0_20px_rgba(16,185,129,.4)]";
-    title.textContent = "All Links Verified — Click to Open PS Store";
-    subtitle.innerHTML = `<span class="text-emerald-300">18/18 direct /product/ links</span> now open in new tab. If preview blocks popups, link is auto-copied.`;
-    panel.className = "relative rounded-[24px] border border-emerald-900/50 bg-[#0f1311] overflow-hidden shadow-[0_0_0_1px_rgba(16,185,129,.15)_inset,0_20px_60px_-20px_rgba(16,185,129,.2)]";
-  }
-}
-
 function renderFree(){
   const grid=document.getElementById('freeGamesGrid');
   grid.innerHTML = FREE_GAMES.map(g=>`
-    <div class="group relative rounded-[18px] border border-emerald-900/30 bg-[#111116] p-4 hover:border-emerald-800/50 transition overflow-hidden">
+    <div class="group rounded-[18px] border border-emerald-900/30 bg-[#111116] p-4 hover:border-emerald-800/50 transition">
       <div class="flex justify-between gap-3">
-        <div class="min-w-0">
-          <div class="flex flex-wrap gap-1.5">
-            <span class="px-2.5 py-0.5 rounded-full bg-emerald-500 text-black text-[10px] font-bold">FREE • FULL GAME</span>
-            <span class="px-2 py-0.5 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-mono">${g.category.toUpperCase()}</span>
-          </div>
-          <h3 class="font-bold text-[14px] mt-2.5">${g.title}</h3>
-          <p class="font-mono text-[11px] text-zinc-500 mt-1">${g.edition}</p>
-          <p class="font-mono text-[10px] text-emerald-300/80 mt-1.5">${g.reason}</p>
-        </div>
+        <div class="min-w-0"><div class="flex gap-1.5"><span class="px-2.5 py-0.5 rounded-full bg-emerald-500 text-black text-[10px] font-bold">FREE</span><span class="px-2 py-0.5 rounded-full bg-zinc-800 border border-zinc-700 text-[10px] font-mono">${g.category.toUpperCase()}</span></div><h3 class="font-bold text-[14px] mt-2.5">${g.title}</h3><p class="font-mono text-[11px] text-zinc-500 mt-1">${g.edition}</p></div>
         <div class="text-right"><p class="font-bold text-[18px] text-emerald-400">FREE</p><p class="font-mono text-[10px] mt-1 px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800">${g.platforms.join('/')}</p></div>
       </div>
       <div class="mt-4 grid grid-cols-2 gap-2">
-        <button data-ps-id="${g.productIN}" data-ps-loc="en-in" class="text-center py-2.5 rounded-full bg-white text-black text-[11px] font-bold hover:bg-zinc-100 transition shadow cursor-pointer w-full">FREE IN — Direct ↗</button>
-        <button data-ps-id="${g.productIN}" data-ps-loc="en-us" class="text-center py-2.5 rounded-full bg-zinc-900 border border-zinc-700 text-[11px] font-bold hover:bg-zinc-800 transition cursor-pointer w-full">US Direct ↗</button>
+        <button data-ps-id="${g.productIN}" data-ps-loc="en-in" class="py-2.5 rounded-full bg-white text-black text-[11px] font-bold hover:bg-zinc-100 cursor-pointer w-full">FREE IN ↗</button>
+        <button data-ps-id="${g.productIN}" data-ps-loc="en-us" class="py-2.5 rounded-full bg-zinc-900 border border-zinc-700 text-[11px] font-bold hover:bg-zinc-800 cursor-pointer w-full">US ↗</button>
       </div>
-      <p class="font-mono text-[9px] text-zinc-600 mt-2.5 truncate">store.playstation.com/.../${g.productIN} • ${g.verified}</p>
     </div>`).join('');
 }
-
 function renderPaid(){
   const grid=document.getElementById('bestDealsGrid');
   const list=document.getElementById('gamesList');
   const verifiedPaid = PAID_GAMES.filter(g=> g.realINR<1000);
-  document.getElementById('paidCount').textContent = `${verifiedPaid.length} verified under ₹1000`;
+  document.getElementById('paidCount').textContent = `${verifiedPaid.length} under ₹1000`;
+  document.getElementById('statTotal').textContent = PAID_GAMES.length + FREE_GAMES.length;
   grid.innerHTML = verifiedPaid.map(g=>`
     <div class="rounded-[18px] border border-zinc-800 bg-[#15151a] p-4 hover:border-zinc-700 transition">
-      <div class="flex justify-between gap-2">
-        <div><div class="flex flex-wrap gap-1"><span class="px-2.5 py-0.5 rounded-full bg-[#0070D1] text-white text-[10px] font-bold">${g.discount}% OFF</span><span class="px-2 py-0.5 rounded-full bg-white text-black text-[10px] font-bold">PAY & PLAY</span></div><h3 class="font-bold text-[14px] mt-2.5">${g.title}</h3><p class="font-mono text-[11px] text-zinc-500 mt-1">${g.edition} • ${g.platforms.join('/')}</p></div>
-        <div class="text-right"><p class="font-bold text-[18px]">${formatINR(g.realINR)}</p><p class="text-[11px] line-through text-zinc-600">${formatINR(g.baseINR)}</p></div>
-      </div>
-      <div class="mt-2.5 font-mono text-[10px] text-zinc-500 truncate">Direct: /product/${g.productIN}</div>
+      <div class="flex justify-between gap-2"><div><span class="px-2.5 py-0.5 rounded-full bg-[#0070D1] text-white text-[10px] font-bold">${g.discount}% OFF</span><span class="ml-1 px-2 py-0.5 rounded-full bg-white text-black text-[10px] font-bold">PAY & PLAY</span><h3 class="font-bold text-[14px] mt-2.5">${g.title}</h3><p class="font-mono text-[11px] text-zinc-500 mt-1">${g.edition}</p></div><div class="text-right"><p class="font-bold text-[18px]">${formatINR(g.realINR)}</p><p class="text-[11px] line-through text-zinc-600">${formatINR(g.baseINR)}</p></div></div>
       <div class="mt-3.5 grid grid-cols-2 gap-2">
-        <button data-ps-id="${g.productIN}" data-ps-loc="en-in" class="text-center py-2.5 rounded-full bg-[#0070D1] text-white text-[11px] font-bold hover:bg-blue-600 transition shadow cursor-pointer w-full">PS India — Full ↗</button>
-        <button data-ps-id="${g.productUS||g.productIN}" data-ps-loc="en-us" class="text-center py-2.5 rounded-full bg-zinc-800 border border-zinc-700 text-[11px] font-bold hover:bg-zinc-700 cursor-pointer w-full">PS US Direct ↗</button>
+        <button data-ps-id="${g.productIN}" data-ps-loc="en-in" class="py-2.5 rounded-full bg-[#0070D1] text-white text-[11px] font-bold hover:bg-blue-600 cursor-pointer w-full">India Store ↗</button>
+        <button data-ps-id="${g.productUS||g.productIN}" data-ps-loc="en-us" class="py-2.5 rounded-full bg-zinc-800 border border-zinc-700 text-[11px] font-bold hover:bg-zinc-700 cursor-pointer w-full">US Store ↗</button>
       </div>
-      <p class="font-mono text-[9px] text-zinc-500 mt-2">${g.verified}</p>
     </div>`).join('');
-
   list.innerHTML = verifiedPaid.map(g=>`
-    <div class="grid grid-cols-1 md:grid-cols-[1.9fr_0.7fr_0.8fr_0.7fr_0.6fr_0.8fr] gap-2 px-4 md:px-5 py-4 items-center hover:bg-zinc-900/50 transition">
-      <div class="flex gap-3 items-center min-w-0"><div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0070D1] to-violet-600 grid place-items-center text-[11px] font-bold">${g.franchise.slice(0,2).toUpperCase()}</div><div class="min-w-0"><p class="font-bold text-[13px] truncate">${g.title}</p><p class="font-mono text-[11px] text-zinc-500 truncate">${g.edition} • ${g.category}</p></div></div>
-      <div class="font-mono text-[12px]"><span class="line-through text-zinc-600">${formatINR(g.baseINR)}</span><br><span class="text-emerald-300 font-bold">${formatINR(g.realINR)} verified</span></div>
-      <div class="font-mono text-[12px]"><span class="font-bold text-white">${formatINR(g.realINR)}</span><br><span class="text-[10px] text-zinc-500">${g.discount}% OFF</span></div>
+    <div class="grid grid-cols-1 md:grid-cols-[1.9fr_0.7fr_0.8fr_0.7fr_0.6fr_0.8fr] gap-2 px-4 md:px-5 py-4 items-center hover:bg-zinc-900/50">
+      <div class="flex gap-3 items-center min-w-0"><div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0070D1] to-violet-600 grid place-items-center text-[11px] font-bold">${g.franchise.slice(0,2).toUpperCase()}</div><div class="min-w-0"><p class="font-bold text-[13px] truncate">${g.title}</p><p class="font-mono text-[11px] text-zinc-500 truncate">${g.edition}</p></div></div>
+      <div class="font-mono text-[12px]"><span class="line-through text-zinc-600">${formatINR(g.baseINR)}</span><br><span class="text-emerald-300 font-bold">${formatINR(g.realINR)}</span></div>
+      <div class="font-mono text-[12px] font-bold text-white">${formatINR(g.realINR)}</div>
       <div class="font-mono text-[11px]"><span class="px-2 py-1 rounded-full bg-zinc-900 border border-zinc-800">${g.platforms.join('/')}</span></div>
-      <div class="font-mono text-[10px]"><span class="px-2 py-1 rounded-full bg-white text-black font-bold">PAY & PLAY</span></div>
-      <div class="flex flex-col gap-1"><button data-ps-id="${g.productIN}" data-ps-loc="en-in" class="text-center px-3 py-1.5 rounded-full bg-[#0070D1] text-white text-[11px] font-bold hover:bg-blue-600 cursor-pointer w-full">BUY FULL IN →</button><span class="font-mono text-[8px] text-zinc-600 truncate">${g.productIN}</span></div>
+      <div class="font-mono text-[10px]"><span class="px-2 py-1 rounded-full bg-white text-black font-bold">FULL GAME</span></div>
+      <div><button data-ps-id="${g.productIN}" data-ps-loc="en-in" class="w-full text-center px-3 py-1.5 rounded-full bg-[#0070D1] text-white text-[11px] font-bold hover:bg-blue-600 cursor-pointer">BUY IN →</button></div>
     </div>`).join('');
 }
-
 document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('year').textContent=new Date().getFullYear();
-  document.getElementById('lastUpdated').textContent=new Date().toLocaleString('en-IN') + ' • 12 paid + 6 free full games';
-  runSelfTest();
+  document.getElementById('lastUpdated').textContent=new Date().toLocaleString('en-IN') + ' • 18 games • new tab only';
   renderFree();
   renderPaid();
   document.getElementById('refreshBtn').addEventListener('click',()=>{
     document.getElementById('rateLimitBar').style.width='100%';
-    setTimeout(()=>{location.reload();},600);
+    setTimeout(()=>{location.reload();},500);
   });
 });
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a29af017e82dc230',t:'MTc4NjQ5MDA3OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
