@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PS Tracker • Pay & Play FULL GAMES Only + Free Games</title>
+<meta name="theme-color" content="#0070D1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PS Deals">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=14">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=14">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180.png?v=14">
+<link rel="manifest" href="/manifest.json?v=14">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Space Grotesk','sans-serif'],mono:['JetBrains Mono','monospace']}}}}</script>
@@ -19,7 +27,7 @@
 <header class="sticky top-0 z-50 border-b border-zinc-800/80 glass">
   <div class="max-w-[1600px] mx-auto px-4 md:px-6 py-4 flex flex-wrap justify-between gap-3 items-center">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0070D1] to-[#6d28d9] grid place-items-center font-bold text-xl">P</div>
+      <img src="/icon-192.png?v=14" alt="PS Deals" class="w-10 h-10 rounded-xl object-cover shadow-[0_0_20px_rgba(0,112,209,.3)]">
       <div>
         <h1 class="text-[16px] md:text-[18px] font-bold leading-none tracking-tight">PS DEALS — PAY & PLAY FULL GAMES ONLY</h1>
         <p class="text-[10px] font-mono text-zinc-400 mt-1 tracking-wide">Live from store.playstation.com • IN region • Chihiro API • Free public</p>
@@ -39,7 +47,7 @@
     <div class="pointer-events-none absolute inset-0 grid-pattern opacity-[0.10]"></div>
     <div class="relative p-6 md:p-7 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
       <div class="flex gap-4 items-start">
-        <div class="hidden md:grid w-12 h-12 rounded-[14px] bg-gradient-to-br from-[#0070D1] to-violet-600 place-items-center font-bold text-[18px]">P</div>
+        <img src="/icon-192.png?v=14" alt="PS Deals" class="hidden md:block w-12 h-12 rounded-[14px] object-cover shadow-[0_0_20px_rgba(0,112,209,.3)]">
         <div>
           <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-mono tracking-widest text-zinc-400">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LIVE API: store.playstation.com/store/api/chihiro • IN/en
@@ -265,6 +273,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderFree(); renderPaid();
   document.getElementById('refreshBtn').addEventListener('click', refreshLivePrices);
 });
+// PWA Service Worker registration for installable app + icon precache
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js?v=14')
+      .then(reg => console.log('SW registered v12', reg.scope))
+      .catch(err => console.log('SW fail', err));
+  });
+}
 </script>
 </body>
 </html>
