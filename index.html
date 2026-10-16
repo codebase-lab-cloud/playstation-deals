@@ -74,6 +74,41 @@
     <div id="liveStatus" class="px-6 md:px-7 pb-4 font-mono text-[10px] text-zinc-500 hidden">Fetching <span id="fetchCount">0</span>/18 from Chihiro API...</div>
   </div>
 
+  <!-- SEARCH GAME DETAILS FEATURE (Agent 2) -->
+  <section class="rounded-[20px] border border-blue-900/40 bg-gradient-to-r from-[#0d1322] via-[#0f1118] to-[#12151f] p-5 md:p-6 shadow-[0_10px_30px_rgba(0,112,209,0.12)] space-y-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="w-1.5 h-7 bg-[#0070D1] rounded-full block shadow-[0_0_12px_rgba(0,112,209,.6)]"></span>
+        <div>
+          <h2 class="font-bold text-[16px] tracking-wide flex items-center gap-2">
+            FIND GAME DETAILS
+            <span class="px-2 py-0.5 rounded-full bg-[#0070D1]/20 border border-[#0070D1]/40 text-[#60a5fa] text-[10px] font-mono font-bold">LIVE QUERY</span>
+          </h2>
+          <p class="text-[11px] font-mono text-zinc-400 mt-0.5">Type any game name or catalog keyword to instantly fetch pricing, platform, and PlayStation Store links</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="font-mono text-[10px] text-zinc-500">Fast Lookup • In-catalog & PS Store</span>
+      </div>
+    </div>
+
+    <form id="gameSearchForm" class="flex flex-col sm:flex-row gap-2.5 items-center">
+      <div class="relative w-full">
+        <input id="gameSearchInput" type="text" placeholder="Enter game name (e.g. Witcher, Batman, God of War, Spider-Man)..." autocomplete="off" class="w-full px-4 py-3 pl-11 rounded-xl bg-zinc-900/90 border border-zinc-700/80 text-[13px] text-white placeholder-zinc-500 focus:outline-none focus:border-[#0070D1] focus:ring-2 focus:ring-[#0070D1]/20 transition font-sans">
+        <svg class="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      </div>
+      <button type="submit" id="searchGameBtn" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#0070D1] hover:bg-[#0060b8] active:scale-[0.98] text-white font-bold text-[12px] tracking-wider transition flex items-center justify-center gap-2 shadow-[0_0_18px_rgba(0,112,209,.4)] shrink-0 cursor-pointer">
+        <span>FIND DETAILS</span>
+        <span id="searchSpinner" class="hidden animate-spin">↻</span>
+      </button>
+      <button type="button" id="clearSearchBtn" class="w-full sm:w-auto px-4 py-3 rounded-xl bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 font-bold text-[12px] transition hidden shrink-0 cursor-pointer">
+        CLEAR
+      </button>
+    </form>
+
+    <div id="searchResultsContainer" class="space-y-3"></div>
+  </section>
+
   <section class="space-y-4">
     <div class="flex items-center gap-3">
       <span class="w-1.5 h-7 bg-emerald-500 rounded-full block shadow-[0_0_12px_rgba(16,185,129,.5)]"></span>
@@ -228,10 +263,146 @@ async function refreshLivePrices(){
   document.getElementById('lastUpdated').textContent=new Date().toLocaleString('en-IN') + ' • LIVE API • '+done+' prices';
   showToast(`Live refresh done • ${done} products from Chihiro API • ${PAID_GAMES.filter(g=>g.realINR<1000).length} under ₹1000 now`);
   renderFree(); renderPaid();
+  // Agent 2 search bindings
+  const searchForm = document.getElementById('gameSearchForm');
+  if(searchForm){
+    searchForm.addEventListener('submit', handleGameSearch);
+    document.getElementById('clearSearchBtn').addEventListener('click', clearGameSearch);
+  }
   setTimeout(()=>{ bar.style.width='0%'; status.classList.add('hidden'); }, 1200);
   icon.textContent='↻'; txt.textContent='REFRESH LIVE'; btn.disabled=false; btn.classList.remove('opacity-70');
   isRefreshing=false;
   localStorage.setItem('ps_live_cache', JSON.stringify({ts:Date.now(), games:PAID_GAMES}));
+}
+
+
+// --- AGENT 2: GAME NAME SEARCH & DETAILS FINDER ---
+async function handleGameSearch(e){
+  if(e) e.preventDefault();
+  const input = document.getElementById('gameSearchInput');
+  const query = (input.value || '').trim();
+  const container = document.getElementById('searchResultsContainer');
+  const spinner = document.getElementById('searchSpinner');
+  const clearBtn = document.getElementById('clearSearchBtn');
+
+  if(!query){
+    container.innerHTML = '<div class="p-3 text-[12px] font-mono text-zinc-500 rounded-xl bg-zinc-900/60 border border-zinc-800">Please enter a game name to search.</div>';
+    return;
+  }
+
+  clearBtn.classList.remove('hidden');
+  spinner.classList.remove('hidden');
+  container.innerHTML = '<div class="p-4 text-[12px] font-mono text-zinc-400 rounded-xl bg-zinc-900/60 border border-zinc-800 flex items-center gap-2"><span class="animate-spin inline-block">↻</span> Searching for "' + query + '"...</div>';
+
+  const qLower = query.toLowerCase();
+  const allGames = [...PAID_GAMES, ...FREE_GAMES];
+  const matched = allGames.filter(g => 
+    g.title.toLowerCase().includes(qLower) || 
+    (g.franchise && g.franchise.toLowerCase().includes(qLower)) ||
+    (g.category && g.category.toLowerCase().includes(qLower)) ||
+    (g.edition && g.edition.toLowerCase().includes(qLower))
+  );
+
+  let html = '';
+
+  if(matched.length > 0){
+    // Fetch live price for matched games if not fetched yet
+    for(const g of matched){
+      if(!g.liveDisplay && g.productIN && !g.isFree){
+        try{
+          const live = await fetchLivePrice(g.productIN);
+          g.livePrice = live.price;
+          g.liveDisplay = live.display_price;
+          if(live.price && g.baseINR && g.baseINR > live.price){
+            g.discount = Math.round((1 - live.price / g.baseINR) * 100);
+          }
+        }catch(err){
+          console.warn('Live fetch error for search item:', err);
+        }
+      }
+    }
+
+    html += '<div class="text-[11px] font-mono text-zinc-400 mb-2 flex items-center justify-between"><span>Found ' + matched.length + ' matching game(s) in catalog:</span><span class="text-emerald-400 font-bold">✓ Live details synced</span></div>';
+    html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">';
+    html += matched.map(g => {
+      const isUnder = (g.realINR !== undefined && g.realINR < 1000) || g.isFree;
+      const priceText = g.isFree ? 'FREE' : formatINR(g.livePrice !== null && g.livePrice !== undefined ? g.livePrice : g.realINR);
+      const strikeText = (!g.isFree && g.baseINR && g.baseINR > (g.livePrice || g.realINR)) ? `<span class="text-[11px] line-through text-zinc-500 ml-1.5">${formatINR(g.baseINR)}</span>` : '';
+      const badgeText = g.isFree ? 'FREE GAME' : (g.discount ? `${g.discount}% OFF` : (isUnder ? 'UNDER ₹1000' : 'FULL GAME'));
+      const badgeColor = g.isFree ? 'bg-emerald-500 text-black' : (isUnder ? 'bg-[#0070D1] text-white' : 'bg-zinc-800 text-zinc-300');
+      const platformTags = (g.platforms || ['PS4', 'PS5']).map(p => `<span class="px-1.5 py-0.5 rounded bg-zinc-800 text-[9px] font-mono text-zinc-400 border border-zinc-700/60">${p}</span>`).join(' ');
+
+      return `
+        <div class="rounded-[16px] border ${isUnder ? 'border-blue-800/50 bg-[#101420]' : 'border-zinc-800 bg-[#13141a]'} p-4 shadow-lg flex flex-col justify-between hover:border-zinc-600 transition">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex flex-wrap gap-1.5 items-center">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeColor}">${badgeText}</span>
+                <span class="px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-700 text-[10px] font-mono text-zinc-400">${(g.category || 'GAME').toUpperCase()}</span>
+              </div>
+              <div class="flex gap-1">${platformTags}</div>
+            </div>
+            <h3 class="font-bold text-[15px] text-white mt-2.5 leading-snug">${g.title}</h3>
+            <p class="font-mono text-[11px] text-zinc-400 mt-1">${g.edition || 'Full Game'} • ${g.liveDisplay || priceText}</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Store Price</p>
+              <p class="font-bold text-[17px] ${g.isFree ? 'text-emerald-400' : (isUnder ? 'text-emerald-300' : 'text-white')}">${priceText} ${strikeText}</p>
+            </div>
+            <div class="flex gap-1.5">
+              <button data-ps-id="${g.productIN}" data-ps-loc="en-in" class="px-3.5 py-2 rounded-full bg-[#0070D1] hover:bg-[#005fb3] text-white text-[11px] font-bold cursor-pointer transition shadow-[0_0_10px_rgba(0,112,209,0.3)]">
+                India Store ↗
+              </button>
+              <button data-ps-id="${g.productUS || g.productIN}" data-ps-loc="en-us" class="px-3 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-[11px] font-bold text-zinc-300 cursor-pointer transition">
+                US ↗
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    html += '</div>';
+  } else {
+    // If not in catalog, construct direct PlayStation store search links
+    const encodedQ = encodeURIComponent(query);
+    const inStoreSearchUrl = 'https://store.playstation.com/en-in/search/' + encodedQ;
+    const usStoreSearchUrl = 'https://store.playstation.com/en-us/search/' + encodedQ;
+    html = `
+      <div class="rounded-[16px] border border-blue-900/50 bg-[#0f1422] p-4 md:p-5 shadow-lg">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-950/80 border border-blue-800 text-[10px] font-mono text-blue-300">
+              <span>🔍</span> DIRECT STORE LOOKUP
+            </div>
+            <h3 class="font-bold text-[16px] text-white">Query: "${query}"</h3>
+            <p class="text-[12px] text-zinc-400">Game not in local cache of 18 featured deals. Click below to view live details and pricing directly on the official PlayStation Store.</p>
+          </div>
+          <div class="flex flex-wrap sm:flex-nowrap gap-2 shrink-0">
+            <a href="${inStoreSearchUrl}" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-full bg-[#0070D1] hover:bg-[#005fb3] text-white text-[11px] font-bold transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,112,209,0.4)]">
+              <span>Search India PS Store</span>
+              <span>↗</span>
+            </a>
+            <a href="${usStoreSearchUrl}" target="_blank" rel="noopener noreferrer" class="px-4 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-[11px] font-bold transition flex items-center gap-1.5">
+              <span>Search US Store</span>
+              <span>↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+  spinner.classList.add('hidden');
+}
+
+function clearGameSearch(){
+  const input = document.getElementById('gameSearchInput');
+  input.value = '';
+  document.getElementById('searchResultsContainer').innerHTML = '';
+  document.getElementById('clearSearchBtn').classList.add('hidden');
+  input.focus();
 }
 
 function renderFree(){
@@ -271,6 +442,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
   }catch(e){}
   renderFree(); renderPaid();
+  // Agent 2 search bindings
+  const searchForm = document.getElementById('gameSearchForm');
+  if(searchForm){
+    searchForm.addEventListener('submit', handleGameSearch);
+    document.getElementById('clearSearchBtn').addEventListener('click', clearGameSearch);
+  }
   document.getElementById('refreshBtn').addEventListener('click', refreshLivePrices);
 });
 // PWA Service Worker registration for installable app + icon precache
