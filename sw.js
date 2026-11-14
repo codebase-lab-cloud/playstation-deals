@@ -1,5 +1,5 @@
-// PS Deals PWA - Service Worker - Cache v15 - Good Favicon + Gradient Big PS Deals
-const CACHE_NAME = 'ps-deals-v15';
+// PS Deals PWA - Service Worker - Cache v16 - Good Favicon + Gradient Big PS Deals
+const CACHE_NAME = 'ps-deals-v16';
 const PRECACHE_URLS = [
   './',
   'index.html',
