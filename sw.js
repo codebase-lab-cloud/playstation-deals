@@ -1,14 +1,15 @@
 // PS Deals PWA - Service Worker - Cache v16 - Good Favicon + Gradient Big PS Deals
-const CACHE_NAME = 'ps-deals-v16';
+const CACHE_NAME = 'ps-deals-v20';
 const PRECACHE_URLS = [
   './',
   'index.html',
-  'manifest.json?v=15',
-  'icon-512.png?v=15',
-  'icon-192.png?v=15',
-  'apple-touch-icon-180.png?v=15',
-  'favicon-32.png?v=15',
-  'icon-32.png?v=15'
+  'manifest.json?v=20',
+  'favicon.svg?v=20',
+  'icon-512.png?v=20',
+  'icon-192.png?v=20',
+  'apple-touch-icon-180.png?v=20',
+  'favicon-32.png?v=20',
+  'icon-32.png?v=20'
 ];
 
 self.addEventListener('install', event => {
